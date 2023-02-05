@@ -6,20 +6,20 @@
 // includes here
 #include <iostream>  // using std::cout, std::endl;
 #include <string>    // using std::stof, std::string
-#include <stack>     // using std::stack<double>, std::stack<char>
+#include <stack>     // using std::stack<char>
 #include <deque>     // using std::deque
 
 namespace csce311 {
 
 class Calculate {
-  public:
+ public:
     Calculate(int size, char* input[]);
     void readInAndCalculate(int size, char* input[]);
     void multiplyDivide();
     void addSub();
     void printResult();
 
-  private:
+ private:
     std::deque<double> operand_;
     std::stack<char*> operators_;
 };
