@@ -13,7 +13,6 @@ namespace csce311 {
 
 class Calculate {
  public:
-    Calculate(int size, char* input[]);
     void readInAndCalculate(int size, char* input[]);
     void multiplyDivide();
     void addSub();

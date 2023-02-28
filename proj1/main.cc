@@ -3,6 +3,8 @@
 #include <proj1/calculate.h>
 
 int main(int argc, char* argv[]) {
-    csce311::Calculate calculate(argc-1, (argv+1));
+    csce311::Calculate calculate;
+    calculate.readInAndCalculate(argc-1, (argv+1));
+    calculate.printResult();
     return 0;
 }

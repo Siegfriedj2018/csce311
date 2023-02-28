@@ -4,10 +4,6 @@
 
 namespace csce311 {
 
-Calculate::Calculate(int size, char* input[]) {
-    readInAndCalculate(size, (input));
-    printResult();
-}
 
 void Calculate::readInAndCalculate(int size, char* input[]) {
     // Loops through input and read operator and operand
@@ -31,7 +27,7 @@ void Calculate::readInAndCalculate(int size, char* input[]) {
     }
 }
 
-// multliplication and divide function
+// multiplication and divide function
 void Calculate::multiplyDivide() {
     double num1 = 0.0, num2 = 0.0;
     char operation = *(operators_.top());
