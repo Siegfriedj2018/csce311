@@ -20,7 +20,7 @@ class Calculate {
 
  private:
     std::deque<double> operand_;
-    std::stack<char*> operators_;
+    std::deque<char*> operators_;
 };
 
 }   // namespace csce311

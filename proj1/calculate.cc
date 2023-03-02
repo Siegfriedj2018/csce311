@@ -11,17 +11,18 @@ void Calculate::readInAndCalculate(int size, char* input[]) {
     // then does everything else(+, -)
     for (int i = 0; i < size; ++i) {
         if (atof(input[i]) == 0 && (*(input[i]) == 'x' || *(input[i]) == '/')) {
-            operators_.push(input[i]);
+            operators_.push_back(input[i]);
             operand_.push_back(atof(input[i+1]));
             ++i;
             multiplyDivide();
             continue;
         } else if (atof(input[i]) == 0) {
-            operators_.push(input[i]);
+            operators_.push_back(input[i]);
             continue;
         }
         operand_.push_back(atof(input[i]));
     }
+
     if (!operators_.empty()) {
         addSub();
     }
@@ -30,19 +31,15 @@ void Calculate::readInAndCalculate(int size, char* input[]) {
 // multiplication and divide function
 void Calculate::multiplyDivide() {
     double num1 = 0.0, num2 = 0.0;
-    char operation = *(operators_.top());
+    char operation = *(operators_.back());
     if (operation == 'x' || operation == '/') {
-        operators_.pop();
+        operators_.pop_back();
         num1 = operand_.back();
         operand_.pop_back();
         num2 = operand_.back();
         operand_.pop_back();
         if (operation == '/') {
-            if (num1 > num2) {
-                operand_.push_back(num1 / num2);
-            } else {
-                operand_.push_back(num2 / num1);
-            }
+            operand_.push_back(num1 / num2);
         } else {
             operand_.push_back(num1 * num2);
         }
@@ -52,10 +49,11 @@ void Calculate::multiplyDivide() {
 // adding and subtracting function
 void Calculate::addSub() {
     double num1 = 0.0, num2 = 0.0;
-    char operation = *(operators_.top());
+    char operation;
 
     while (!operators_.empty()) {
-        operators_.pop();
+        operation = *(operators_.front());
+        operators_.pop_front();
         num1 = operand_.front();
         operand_.pop_front();
         num2 = operand_.front();
