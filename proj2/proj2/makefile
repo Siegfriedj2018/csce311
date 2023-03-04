@@ -22,10 +22,17 @@ text-client.o : text-client.cc text-client.h
 	$(compile) $< -o $@
 
 #text server compile and link
-text-server : text-server.o
- 	$(link) $@ $^
+text-server : text-server.o UnixDomainSocket.o
+	$(link) $@ $^
 
 text-server.o : text-server.cc text-server.h
+	$(compile) $< -o $@
+
+#UnixDomainSocket class compile and link for client/server
+# UnixDomainSocket : UnixDomainSocket.o
+# 	$(link) $@ $^
+
+UnixDomainSocket.o : UnixDomainSocket.cc UnixDomainSocket.h
 	$(compile) $< -o $@
 
 #Cpplint style checker

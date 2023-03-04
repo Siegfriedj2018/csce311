@@ -3,38 +3,28 @@
 #ifndef PROJ2_TEXT_SERVER_H_
 #define PROJ2_TEXT_SERVER_H_
 
-#include <sys/socket.h>  // Unix header for sockets, using sockets
-#include <sys/un.h>  // defns for Unix domain sockets, using struct sockaddr_un
 #include <sys/sysinfo.h> // using get_nprocs_conf
-#include <unistd.h>  // Unix standard header, using close
-
-#include <assert.h>  // using assert
+#include <assert.h>  // might not need this
 #include <cerrno>    // using errno
 #include <cstddef>   // using size_t
 #include <cstdlib>   // using exit
-#include <cstring>   // using strncpy, strerror
 
-#include <string>
-#include <iostream>
+#include <proj2/UnixDomainSocket.h>
 
-class UnixDomainSocket {
+
+class DomainSocketServer : public UnixDomainSocket {
  public:
-  explicit UnixDomainSocket(const char* socket_path, bool abstract = true);
-
- protected:
-  ::sockaddr_un sock_addr_;
-  std::string socket_path_;
-};
-
-class DomainSocketServer : public  UnixDomainSocket {
- public:
-  using ::UnixDomainSocket::UnixDomainSocket;
-
+  
   DomainSocketServer();
-  void RunServer() const;
+  void RunServer();
+  
  
  private:
-  const int kNum_Proc_;
+  ::sockaddr_un sock_addr_;
+  std::string socket_path_;
+  const int kNum_Proc_ = (get_nprocs_conf() - 1);
 };
+
+
 
 #endif  // PROJ2_TEXT_SERVER_H_
