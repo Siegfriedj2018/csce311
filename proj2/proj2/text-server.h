@@ -14,17 +14,12 @@
 
 class DomainSocketServer : public UnixDomainSocket {
  public:
-  
-  DomainSocketServer();
+  DomainSocketServer(const char* socket_path = "srv_domain_socket");
+  void DomainSocket(const char* socket_path, bool abstract = true);
   void RunServer();
   
- 
  private:
-  ::sockaddr_un sock_addr_;
-  std::string socket_path_;
   const int kNum_Proc_ = (get_nprocs_conf() - 1);
 };
-
-
 
 #endif  // PROJ2_TEXT_SERVER_H_

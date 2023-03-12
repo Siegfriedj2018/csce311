@@ -20,8 +20,29 @@
   }
 */
 
-DomainSocketServer::DomainSocketServer(const char* socket_path, bool abstract) {
-  UnixDomainSocket(socket_path, abstract);
+DomainSocketServer::DomainSocketServer(const char* socket_path) 
+  : UnixDomainSocket() {
+    DomainSocket(socket_path);
+  }
+
+inline void DomainSocketServer::DomainSocket(const char* socket_path, bool abstract) {
+  socket_path_ = std::string(socket_path);
+
+  sock_addr_ = {};
+  sock_addr_.sun_family = AF_UNIX;
+
+  if (abstract) {
+    strncpy(sock_addr_.sun_path + 1,
+            socket_path,
+            sizeof(sock_addr_.sun_path) - 1);
+  } else {
+    strncpy(sock_addr_.sun_path,
+            socket_path,
+            sizeof(sock_addr_.sun_path));
+    // return 1; // for not abstract for whatever reason
+  }
+  // errored
+  // return -1;
 }
 
 
@@ -118,10 +139,10 @@ void DomainSocketServer::RunServer() {
 
 
 
-// const char kSocket_path[] = "socket_cli_srv_domain_socket";
+const char kSocket_path[] = "srv_domain_socket";
 
 int main(int argc, char *argv[]) {
-  DomainSocketServer dss;
+  DomainSocketServer dss(kSocket_path);
   dss.RunServer();
   
   return 0;

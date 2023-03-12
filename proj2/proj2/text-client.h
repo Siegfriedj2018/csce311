@@ -16,8 +16,8 @@ class DomainSocketClient : public UnixDomainSocket {
    void RunClient();
   
   protected:
-    ::sockaddr_un sock_addr_;
-    std::string socket_path_;
-}
+    // ::sockaddr_un sock_addr_;
+    // std::string socket_path_;
+};
 
 #endif  // PROJ2_TEXT_CLIENT_H_
