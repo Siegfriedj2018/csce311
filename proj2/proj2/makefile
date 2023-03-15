@@ -15,17 +15,23 @@ compile = $(cc) $(flags) -c
 
 
 #text client compile and link
-text-client : text-client.o
+text-client : domainsocketclient.o text-client.o
 	$(link) $@ $^
 
-text-client.o : text-client.cc text-client.h UnixDomainSocket.h
+text-client.o : TextClient.cc UnixDomainSocket.h DomainSocketServer.h
+	$(compile) $< -o $@
+
+domainsocketclient.o : DomainSocketClient.cc DomainSocketClient.h UnixDomainSocket.h
 	$(compile) $< -o $@
 
 #text server compile and link
-text-server : text-server.o
+text-server : domainsocketserver.o text-server.o
 	$(link) $@ $^
 
-text-server.o : text-server.cc text-server.h UnixDomainSocket.h
+text-server.o : TextServer.cc UnixDomainSocket.h DomainSocketServer.h
+	$(compile) $< -o $@
+
+domainsocketserver.o : DomainSocketServer.cc DomainSocketServer.h UnixDomainSocket.h
 	$(compile) $< -o $@
 
 #UnixDomainSocket class compile and link for client/server
@@ -36,7 +42,13 @@ text-server.o : text-server.cc text-server.h UnixDomainSocket.h
 # 	$(compile) $< -o $@
 
 #Cpplint style checker
-style : text-server.cc text-server.h text-client.cc text-client.h
+style : TextServer.cc \
+		DomainSocketServer.cc \
+		DomainSocketServer.h \
+		TextClient.cc \
+		DomainSocketClient.cc \
+		DomainSocketClient.h \
+		UnixDomainSocket.h
 	cpplint --root=$(path) $^
 
 clean:
