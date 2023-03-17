@@ -4,6 +4,7 @@
 #define PROJ2_DOMAINSOCKETCLIENT_H_
 
 #include <proj2/UnixDomainSocket.h>
+#include <string>   // using string
 
 #include <cassert>  // might not need
 #include <cerrno>   // using errno
@@ -12,15 +13,12 @@
 
 class DomainSocketClient : public UnixDomainSocket {
  public:
-  DomainSocketClient(const char* socket_path,
-                     int count,
-                     char* command_line[]);
+  explicit DomainSocketClient(const char* socket_path);
   void ParseCLI(int count, char* commandline[]);
   void RunClient();
 
  private:
-  char* commands;
-  
+  std::string commands_;
 };
 
 #endif  // PROJ2_DOMAINSOCKETCLIENT_H_

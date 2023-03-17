@@ -10,16 +10,22 @@
 #include <cerrno>        // using errno
 #include <cstddef>       // using size_t
 #include <cstdlib>       // using exit
+#include <vector>         // using vector
+#include <string>         // using string
 
 class DomainSocketServer : public UnixDomainSocket {
  public:
-  DomainSocketServer(const char* socket_path,
-                     bool abstract = true);
+  explicit DomainSocketServer(const char* socket_path);
+  std::string SearchFile(std::string buffer_string);
+  const std::vector<std::string> Explode(const std::string s, const char c);
   void RunServer();
-  std::string searchFile(std::string filename, std::string keyword);
 
  private:
   const int kNum_Proc_ = (get_nprocs_conf() - 1);
+  std::string filename_;
+  std::string path_;
+  std::string op_;
+  std::vector<std::string> seeking_;
 };
 
 #endif  // PROJ2_DOMAINSOCKETSERVER_H_
