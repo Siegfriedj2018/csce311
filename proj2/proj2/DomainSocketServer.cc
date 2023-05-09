@@ -1,22 +1,7 @@
 /* Copyright 2023 Siegfrij */
 
 #include <proj2/DomainSocketServer.h>
-#include "DomainSocketServer.h"
-// notes from recording 11 on blackboard
 
-// TODO(Siegfrij):
-/*
-  to parse string:
-  std::string whatever = "abc;def"
-
-  for (char c : whatever) {
-    if (c == static_cast<char>(unit sep)) {
-      something
-    } else {
-      write c
-    }
-  }
-*/
 
 DomainSocketServer::DomainSocketServer(const char* socket_path) :
   UnixDomainSocket(socket_path), path_(""), 
@@ -27,6 +12,7 @@ void DomainSocketServer::RunServer() {
   int ser_cli_sock_fd;
   std::string bytes_stream = "";
   std::vector<std::string> exploded_string;
+  std::vector<std::string> results;
 
   // (1) Create a socket
   sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -59,6 +45,7 @@ void DomainSocketServer::RunServer() {
   const size_t kBufferSize = 512;
   char kBuffer[kBufferSize] = "";
   ::ssize_t bytes_read;
+  ssize_t bytes_wrote;
 
   while (true) {
     // (4) accept connection from client
@@ -102,7 +89,7 @@ void DomainSocketServer::RunServer() {
         for (size_t i = 1, j = 0; i <= exploded_string.size();
             i += 2, ++j) {
           seeking_.push_back(exploded_string[i]);
-          std::clog << i << " " << seeking_[j];
+          std::clog << seeking_[j];
           if (i != exploded_string.size() - 1) {
             std::clog << ", ";
           }
@@ -116,9 +103,22 @@ void DomainSocketServer::RunServer() {
       }
       std::clog << std::endl;
 
-      // DomainSocketServer::SearchFile(bytes_stream);
+      results = DomainSocketServer::SearchFile(path_, op_, seeking_);
+
+      char bytes_To_Send[kBufferSize];
+      size_t write_count = 0;
+      for (size_t i = 0; i < results.size(); ++i) {
+        for (size_t j = 0; j < results[i].size() &&
+                           write_count < kBufferSize; ++j, ++write_count) {
+          bytes_To_Send[write_count] = results[i][j];
+        }
+      }
+
+
+      bytes_wrote = write(ser_cli_sock_fd, bytes_To_Send, write_count);
 
       std::clog << "BYTES RECIEVED: " << bytes_read << std::endl;
+      std::clog << "BYTES SENT: " << bytes_wrote << std::endl; 
 
       if (bytes_read == 0) {
         std::clog << "CLIENT DISCONNECTED" << std::endl;
@@ -131,19 +131,6 @@ void DomainSocketServer::RunServer() {
       CleanUp();
       close(ser_cli_sock_fd);
       break;
-      // bool found_etx = false;
-      // for (int i = 0; i < bytes_read; i++) {
-      //   if (kBuffer[i] == kETX_) {
-      //     found_etx = true;
-      //     close(ser_cli_sock_fd);
-      //     break;
-      //   }
-      // }
-
-      // if (found_etx) {
-      //   close(ser_cli_sock_fd);
-      //   break;
-      // }
     }
   }
 }
@@ -152,7 +139,6 @@ void DomainSocketServer::CleanUp() {
   path_.erase();
   op_.erase();
   seeking_.clear();
-
 }
 
 /*  
@@ -175,11 +161,47 @@ const std::vector<std::string> DomainSocketServer::Explode(const std::string s,
   }
 
   if (buff != "") {
-    v.push_back(buff);
+    v.push_back(buff.substr(0, buff.size() - 1));
   }
 
   return v;
 }
 
-// std::string DomainSocketServer::SearchFile(std::string buffer_string) {
-// }
+
+std::vector<std::string> DomainSocketServer::SearchFile(std::string path,
+                                           std::string operation,
+                                           std::vector<std::string> seeking) {
+  std::string line = "";
+  std::ifstream fs;
+  std::vector<std::string> found_row;
+  fs.open(path);
+
+  if (!fs.is_open()) {
+    found_row.push_back("INVALID FILE");
+    return found_row;
+  }
+
+  while (getline(fs, line)) {
+    size_t count = 0;
+    for (size_t i = 0; i < seeking.size(); ++i) {
+      size_t pos = line.find(seeking.at(i));
+      // std::clog << "Searching for " << seeking.at(i) << " in..." << std::endl;
+      // std::clog << line << std::endl;
+      // std::clog << std::endl;
+      if (pos != std::string::npos) {
+        ++count;
+        // std::clog << seeking.at(i) << " found" << std::endl;
+        if (operation.compare("OR") == 0) {
+          // std::clog << "Row added" << std::endl;
+          found_row.push_back(line + "\n");
+        }
+      }
+    }
+    if (operation.compare("AND") == 0 && count == seeking.size()) {
+      // std::clog << "Row added" << std::endl;
+      found_row.push_back(line + "\n");
+    }
+  }
+  fs.close();
+  return found_row;
+}

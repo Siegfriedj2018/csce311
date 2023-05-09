@@ -8,8 +8,8 @@ CLIENT="text-client"
 
 # clean things up before beginning
 #
-rm $SERVER_FILES
-rm $CLIENT_FILES
+# rm $SERVER_FILES
+# rm $CLIENT_FILES
 make clean
 
 # build applications

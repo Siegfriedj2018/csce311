@@ -53,4 +53,4 @@ style : TextServer.cc \
 	cpplint --root=$(path) $^
 
 clean:
-	rm -f *.o text-server text-client
+	rm -f *.o text-server text-client *log.txt *out.txt

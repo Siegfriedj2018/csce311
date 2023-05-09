@@ -71,43 +71,46 @@ void DomainSocketClient::RunClient() {
     std::clog << "SERVER DROPPED CONNECTION" << std::endl;
     exit(-2);
   }
+  // close(socket_fd);
+  // std::clog << "CONNECTION CLOSED" << std::endl;
+
+  //  (3b) read from socket
+  const size_t kBufferSize = 512;
+  char kBuffer[kBufferSize];
+  ssize_t bytes_read;
+
+  bytes_read = read(socket_fd, kBuffer, kBufferSize);
+
+  if (bytes_read == 0) {
+    std::clog << "SERVER DISCONNECTED" << std::endl;
+    close(socket_fd);
+  } else if (bytes_read < 0) {
+    std::cerr << strerror(errno) << std::endl;
+    exit(-1);
+  }
+
+  std::string str_buffer(kBuffer);
+  int count = 1;
+  size_t i = 0;
+
+  // std::clog << str_buffer << std::endl;
+  if (str_buffer.find("INVALID FILE") != std::string::npos) {
+    std::clog << "INVALID FILE" << std::endl;
+  } else if (bytes_read == 1) {
+    std::clog << "BYTES RECIEVED: " << bytes_read << std::endl;
+  } else {
+    i = str_buffer.find_first_of('\n');
+    while (str_buffer.size() > 0 && i != std::string::npos) {
+      std::cout << count << "\t";
+      std::cout << str_buffer.substr(0, i);
+      std::cout << std::endl;
+      str_buffer.erase(0, i + 1);
+      count++;
+      i = str_buffer.find_first_of('\n');
+    }
+
+    std::clog << "BYTES RECIEVED: " << bytes_read << std::endl;
+  }
   close(socket_fd);
   std::clog << "CONNECTION CLOSED" << std::endl;
-
-  // //  (3b) read from socket
-  // const size_t kBufferSize = 512;
-  // char kBuffer[kBufferSize];
-  // ssize_t bytes_read;
-
-  // bytes_read = read(socket_fd, kBuffer, kBufferSize);
-
-  // if (bytes_read == 0) {
-  //   std::clog << "SERVER DISCONNECTED" << std::endl;
-  //   close(socket_fd);
-  // } else if (bytes_read < 0) {
-  //   std::cerr << strerror(errno) << std::endl;
-  //   exit(-1);
-  // }
-
-  // std::string str_buffer(kBuffer);
-  // int count = 1;
-  // size_t i = 0;
-
-  // if (str_buffer.find("INVALID FILE") != std::string::npos) {
-  //   std::clog << "INVALID FILE" << std::endl;
-  // } else if (bytes_read == 1) {
-  //   std::clog << "BYTES RECIEVED: " << bytes_read << std::endl;
-  // } else {
-  //   i = str_buffer.find_first_of('\n');
-  //   while (str_buffer.size() > 0 && i != std::string::npos) {
-  //     std::cout << count << "\t";
-  //     std::cout << str_buffer.substr(0, i);
-  //     std::cout << std::endl;
-  //     str_buffer.erase(0, i + 1);
-  //     count++;
-  //     i = str_buffer.find_first_of('\n');
-  //   }
-
-  //   std::clog << "BYTES RECIEVED: " << bytes_read << std::endl;
-  // }
 }

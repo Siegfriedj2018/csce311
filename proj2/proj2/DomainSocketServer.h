@@ -6,17 +6,21 @@
 #include <proj2/UnixDomainSocket.h>
 
 #include <sys/sysinfo.h>  // using get_nprocs_conf
-#include <assert.h>      // might not need this
-#include <cerrno>        // using errno
-#include <cstddef>       // using size_t
-#include <cstdlib>       // using exit
+#include <cerrno>         // using errno
+#include <cstddef>        // using size_t
+#include <cstdlib>        // using exit
 #include <vector>         // using vector
 #include <string>         // using string
+#include <fstream>        // using fstream
+#include <algorithm>      // using find
+
 
 class DomainSocketServer : public UnixDomainSocket {
  public:
   explicit DomainSocketServer(const char* socket_path);
-  std::string SearchFile(std::string buffer_string);
+  std::vector<std::string> SearchFile(std::string path,
+                                      std::string operation,
+                                      std::vector<std::string> seeking);
   const std::vector<std::string> Explode(const std::string s, const char c);
   void RunServer();
   void CleanUp();
